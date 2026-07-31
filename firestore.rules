@@ -1,0 +1,34 @@
+// Akaishi Contracting — Firestore rules
+//
+// Paste this into Firebase console → Firestore Database → Rules.
+//
+// This app has no server, so there is no way for Firestore to verify
+// *who* is making a request — it can only see that some visitor's
+// browser is calling addDoc()/updateDoc()/getDocs(). These rules are
+// therefore intentionally open for the two collections this site uses:
+// anyone can read or write bookings/applications. That is the direct
+// consequence of the "client-only sign-in, no backend" choice.
+//
+// If you later want this locked down for real (e.g. only the signed-in
+// submitter can read their own row, only the admin can change status),
+// switch to Firebase Authentication (Google provider) instead of raw
+// Google Identity Services — Firestore rules can check request.auth
+// once Firebase Auth is involved, and that upgrade doesn't require you
+// to host any server yourself. See README.md → "Locking it down later".
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /bookings/{bookingId} {
+      allow read, create, update: if true;
+      allow delete: if false;
+    }
+    match /applications/{applicationId} {
+      allow read, create, update: if true;
+      allow delete: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
